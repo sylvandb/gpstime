@@ -18,7 +18,9 @@ except:
 while True:
 	gpsd.next()
 	if gpsd.utc:
-		gpstime = gpsd.utc[0:4] + gpsd.utc[5:7] + gpsd.utc[8:10] + ' ' + gpsd.utc[11:19]
+		# extracting the fields should not be needed
+		gpstime = gpsd.utc[0:19]
+		#gpstime = gpsd.utc[0:4] + gpsd.utc[5:7] + gpsd.utc[8:10] + ' ' + gpsd.utc[11:19]
 		print 'Setting system time to GPS time: %s UTC' % gpstime
 		rv = os.system('date --utc --set="%s"' % gpstime)
 		if rv:
