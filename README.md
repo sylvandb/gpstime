@@ -1,4 +1,4 @@
-Meant for use with SOC devices that either lack a real time clock or internet connection (such as a raspberry pi), gpstime will work with your GPS through the GPSd (http://gpsd.berlios.de/) utility to access the current time, and will apply that to your system clock.
+Meant for use with SOC devices that either lack a real time clock or internet connection (such as a raspberry pi), gpstime will work with your GPS through the GPSd (http://www.catb.org/gpsd/) utility to access the current time, and will apply that to your system clock.
 
 Usage examples include remote data logging and chartplotters. I use this module to set the time on my raspberry pi which I use as a chartplotter with OpenCPN. In order to ensure that the tide tables are displaying the correct information, the system time must be set correctly.
 
