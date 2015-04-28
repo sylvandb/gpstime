@@ -53,8 +53,10 @@ while True:
 		gpstime = gpsd.utc[0:19]
 		systime = time.strftime('%Y-%m-%dT%H:%M:%S', time.gmtime())
 		print '     GPS time: %s\n  System time: %s' % (gpstime,systime)
-		if gpstime == systime:
-			print 'System time matches GPS time. Not resetting.'
+		if gpstime == systime or \
+		   (gpstime[:18] == systime[:18] and \
+		    abs(int(gpstime[18]) - int(systime[18])) < 2):
+			print 'System time near enough to GPS time. Not resetting.'
 			break
 		print 'Setting system time to GPS time'
 		rv = set_time(gpstime)
