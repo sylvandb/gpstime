@@ -7,6 +7,8 @@ from gps import *
 USE_DATE_COMMAND = False
 #USE_DATE_COMMAND = True
 
+set = not '--show' in sys.argv
+
 
 
 print 'Attempting to acquire GPS time...'
@@ -32,14 +34,14 @@ else:
 	import struct
 	from calendar import timegm
 	libc = ctypes.CDLL(ctypes.util.find_library('c'))
+		#libc.gettimeofday(tpack, None)
 	def set_time(timestr):
 		tsec = timegm(time.strptime(timestr, '%Y-%m-%dT%H:%M:%S'))
 		# nanoseconds delay from gps msg to set - a fractional second
 		tfrac = 800000000
-		tpack = struct.pack('2q', tsec, tfrac)
 		# (Q=u64, q=s64, l=s32, L=u32)
+		tpack = struct.pack('2q', tsec, tfrac)
 		return libc.settimeofday(tpack, None)
-		#libc.gettimeofday(tpack, None)
 
 
 
@@ -53,18 +55,19 @@ while True:
 		gpstime = gpsd.utc[0:19]
 		systime = time.strftime('%Y-%m-%dT%H:%M:%S', time.gmtime())
 		print '     GPS time: %s\n  System time: %s' % (gpstime,systime)
-		if gpstime == systime or \
-		   (gpstime[:18] == systime[:18] and \
-		    abs(int(gpstime[18]) - int(systime[18])) < 2):
-			print 'System time near enough to GPS time. Not resetting.'
+		if set:
+			if gpstime == systime or \
+			   (gpstime[:18] == systime[:18] and \
+				abs(int(gpstime[18]) - int(systime[18])) < 2):
+				print 'System time near enough to GPS time. Not resetting.'
+				break
+			print 'Setting system time to GPS time'
+			rv = set_time(gpstime)
+			if rv:
+				print '0x%04x: Command failed. TIME NOT SET.' % (0xffff & rv)
+				break
+			print 'System time set.'
 			break
-		print 'Setting system time to GPS time'
-		rv = set_time(gpstime)
-		if rv:
-			print '0x%04x: Command failed. TIME NOT SET.' % (0xffff & rv)
-			break
-		print 'System time set.'
-		break
 	time.sleep(0.4)
 
 sys.exit(rv)
